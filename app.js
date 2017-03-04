@@ -63,7 +63,7 @@ app.post('/form', (req, res)=>{
     res.redirect('/error')
   } else {
     res.redirect('/')
-    maropost.post(req.body)
+    maropost.createContact(req.body)
   }
 
 })
