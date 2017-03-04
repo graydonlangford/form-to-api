@@ -1,10 +1,10 @@
 // require external libraries
 var express = require('express')
 var bodyParser = require('body-parser')
+var expressValidator = require('express-validator')
+var _ = require('underscore')
 
-// require custom external files
-// var FormSubmission = require('FormSubmissionClass.js') // class for the form submission and it's tools
-// var maropost = require('maropost.js') // object for using the maropost API
+var maropost = require('./maropostApi.js') // object for using the maropost API
 
 // set up express server
 var app = express()
@@ -12,6 +12,8 @@ var PORT = process.env.PORT || 3000
 
 // apply bodyParser middleware for all requests: de-stringifies requests.
 app.use(bodyParser.json())
+app.use(bodyParser.urlencoded({ extended: false }));
+app.use(expressValidator())
 
 // ================= Serve Page Routes ================== //
 // serve all files in public
@@ -26,23 +28,44 @@ app.get('/', (req,res)=>{
 app.get('/index', (req,res)=>{
   res.sendFile(__dirname + '/public/index.html')
 })
+
+app.get('/error', (req,res)=>{
+  res.sendFile(__dirname + '/public/error.html')
+})
 // ====================================================== //
 
 
 // ================= Form post listener ================= //
 app.post('/form', (req, res)=>{
   console.log(req.body)
-/*
-  var formData = new FormSubmission(req.body)
 
-  formData.trimInvalidFields()
+  var allowedFields = [
+    'fname',
+    'lname',
+    'email'
+  ]
 
-  if (formData.isValid()) {
-    //redirect to home?
+  req.body = _.pick(req.body, allowedFields)
+
+  req.sanitizeBody('fname').escape()
+  req.sanitizeBody('lname').escape()
+  req.sanitizeBody('email').escape()
+
+  req.checkBody('fname', 'Invalid Name').isAlpha().notEmpty()
+  req.checkBody('lname', 'Invalid Name').isAlpha().notEmpty()
+  req.checkBody('email', 'Invalid Name').isEmail().notEmpty()
+
+  var errors = req.validationErrors()
+
+  if (errors) {
+    console.log('VALIDATION ERRORS:')
+    console.log(errors)
+    res.redirect('/error')
   } else {
-    //redirect with error?
+    res.redirect('/')
+    maropost.post(req.body)
   }
-*/
+
 })
 // ====================================================== //
 
