@@ -1,0 +1,11 @@
+Simple test app to server a page with a form
+
+When the form is posted to the server, the server then sends select portions of the data to an external api
+
+INSTALLATION
+
+Built in node.js 4.4.4, npm 2.15.1 so ensure you have compatable versions.
+
+Clone repo, then run ''npm i'' to install all dependancies.
+
+Run the server with ''node app.js'' or for additional features, ''npm run dev''.
