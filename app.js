@@ -37,7 +37,7 @@ app.get('/error', (req,res)=>{
 
 // ================= Form post listener ================= //
 app.post('/form', (req, res)=>{
-  console.log(req.body)
+  // console.log(req.body)
 
   var allowedFields = [
     'fname',
@@ -51,19 +51,22 @@ app.post('/form', (req, res)=>{
   req.sanitizeBody('lname').escape()
   req.sanitizeBody('email').escape()
 
-  req.checkBody('fname', 'Invalid Name').isAlpha().notEmpty()
-  req.checkBody('lname', 'Invalid Name').isAlpha().notEmpty()
-  req.checkBody('email', 'Invalid Name').isEmail().notEmpty()
+  req.checkBody('fname', 'Invalid fname').isAlpha().notEmpty()
+  req.checkBody('lname', 'Invalid lname').isAlpha().notEmpty()
+  req.checkBody('email', 'Invalid email').isEmail().notEmpty()
 
   var errors = req.validationErrors()
 
   if (errors) {
-    console.log('VALIDATION ERRORS:')
     console.log(errors)
     res.redirect('/error')
   } else {
     res.redirect('/')
     maropost.createContact(req.body)
+    .then(maropost.startJourney)
+    .catch(function (error) {
+      console.log(error)
+    })
   }
 
 })

@@ -4,57 +4,69 @@ var dotenv = require('dotenv')
 dotenv.load() // load the file in the root directory called ".env".
 
 maropostApi = {
-  options: {
-    json: true,
-    url: 'https://api.maropost.com/accounts/423/',
-    method: 'POST',
-    qs: {
-      auth_token: process.env.MAROPOST_API_KEY
-    },
-    headers: {
-      'Content-Type': 'application/json',
-      Accept: 'application/json'
-    },
-    body: {}
+  options: function (replacementOptions) {
+    var optionObject = {
+      json: true,
+      url: 'https://api.maropost.com/accounts/423/',
+      method: 'POST',
+      qs: {
+        auth_token: process.env.MAROPOST_API_KEY
+      },
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json'
+      }
+    }
+
+    Object.assign(optionObject, replacementOptions)
+
+    return optionObject
   },
 
-  createContact: function (contact, callback) {
+  createContact: function (reqBody) {
     console.log('creating contact');
-    this.options.url += 'contacts.json'
-    this.options.body.first_name = contact.fname
-    this.options.body.last_name = contact.lname
-    this.options.body.email = contact.email
 
-    var callback = function (err, res, body) {
-      if (!err && res.statusCode >= 200 && res.statusCode < 300) {
-        console.log('successfully created contact')
-        // startJourney(contact, startJourneyCallback)
-      } else {
-        console.log('there was an error creating contact')
-        console.log(res.statusCode);
-        console.log(body);
-        console.log(err)
+    var options = maropostApi.options({
+      body: {
+        first_name: reqBody.fname,
+        last_name: reqBody.lname,
+        email: reqBody.email
       }
-    }
+    })
+    options.url += 'contacts.json'
 
-    var result = request(this.options, callback)
-
+    return new Promise(function(resolve, reject) {
+      request(options, function (err, res, body) {
+        if(!err && res.statusCode >= 200 && res.statusCode < 300) {
+          console.log("successfully created contact");
+          resolve(reqBody)
+        } else {
+          console.log("there was an error creating the contact");
+          reject(err)
+        }
+      })
+    })
   },
 
-  startJourney: function (email, callback) {
-    this.options.url += 'journeys/15394/trigger/40774607451808.json'
-    this.options.url += '?email=' + email
+  startJourney: function (reqBody) {
+    var options = maropostApi.options()
+    options.url += 'journeys/15394/trigger/40774607451808.json'
+    options.qs.email = reqBody.email
 
-    var startJourneyCallback = function (err, res, body) {
-      if (!err && res.statusCode == 200) {
-        console.log('successfully added to journey')
-      } else {
-        console.log('there was an error adding contact to journey')
-        console.log(err)
-      }
-    }
+    console.log(maropostApi.options());
+    console.log(options);
 
-    request(this.options, callback)
+    return new Promise(function(resolve, reject) {
+      request(options, function (err, res, body) {
+        if (!err && res.statusCode >= 200 && res.statusCode < 300) {
+          console.log('successfully added to journey')
+          resolve()
+        } else {
+          console.log("there was an error adding contact to journey");
+          reject(err)
+        }
+      })
+    })
   }
 }
 
