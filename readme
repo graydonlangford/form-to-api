@@ -1,4 +1,6 @@
-Simple test app to server a page with a form
+INTRODUCTION
+
+Simple test app to serve a page with a form
 
 When the form is posted to the server, the server then sends select portions of the data to an external api
 
@@ -6,6 +8,21 @@ INSTALLATION
 
 Built in node.js 4.4.4, npm 2.15.1 so ensure you have compatable versions.
 
-Clone repo, then run ''npm i'' to install all dependancies.
+Clone repo, then run ```npm i``` to install all dependancies.
 
-Run the server with ''node app.js'' or for additional features, ''npm run dev''.
+Run the server with ```node app.js``` or for additional features, ```npm run dev```.
+
+RATIONALE
+
+There are many ways to solve this problem, including client-side scripts and/or AJAX
+
+I chose to add the functionality to the server for several reasons:
+
+ - Code that makes requests from the client side can be tampered with. I didn't see a read-only api from maropost, so we'd also have to store our API key on the client's browser, which is a massive security issue.
+ - Requests made from the client side can be disrupted by extensions like ad-blockers (big problem in the marketing world)
+ - It's actually easier to just drop in some external API services to a server than adding it to the client, since that can affect performance and potentially be more complicated to implement, not to mention potentially disruptive to any default functionality from the form.
+
+TECHNOLOGY
+
+Node, NPM, express. No database needed since it's a basic app. No queue jobs or temp storage or antying. Again; simple app.
+Uses the request, underscore, dotenv, body-parser, and express-validator libraries, because hell, they make stuff easy.
